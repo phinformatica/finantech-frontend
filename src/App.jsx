@@ -1,18 +1,43 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Login from './Login';
-import Cadastro from './Cadastro';
-import Painel from './Painel';
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Login from "./Pages/Login";
+import Cadastro from "./Pages/Cadastro";
+import Painel from "./Pages/Painel";
+import { auth } from "./firebaseConfig";
+import { useEffect, useState } from "react";
 
-function App() {
+export default function App() {
+  const [usuarioLogado, setUsuarioLogado] = useState(false);
+  const [carregando, setCarregando] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setUsuarioLogado(!!user);
+      setCarregando(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  if (carregando) {
+    return <p>Carregando...</p>;
+  }
+
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/cadastro" element={<Cadastro />} />
-        <Route path="/painel" element={<Painel />} />
+        <Route
+          path="/"
+          element={usuarioLogado ? <Navigate to="/painel" /> : <Login />}
+        />
+        <Route
+          path="/cadastro"
+          element={usuarioLogado ? <Navigate to="/painel" /> : <Cadastro />}
+        />
+        <Route
+          path="/painel"
+          element={usuarioLogado ? <Painel /> : <Navigate to="/" />}
+        />
       </Routes>
     </BrowserRouter>
   );
 }
-
-export default App;

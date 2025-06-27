@@ -16,9 +16,10 @@ function Cadastro() {
         alert("Usuário cadastrado com sucesso!");
         navigate("/");
       })
-      .catch(() => {
-        alert("Erro ao cadastrar.");
-      });
+      .catch((error) => {
+  alert("Erro ao cadastrar usuário: " + error.message);
+  console.log(error);
+});
   };
 
   return (
